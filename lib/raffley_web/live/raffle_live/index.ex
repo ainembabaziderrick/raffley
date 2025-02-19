@@ -28,10 +28,11 @@ defmodule RaffleyWeb.RaffleLive.Index do
     """
   end
 
-  attr :raffle, Raffley.Raffle, required: true
+  attr :raffle, Raffley.Raffles.Raffle, required: true
 
   def raffle_card(assigns) do
     ~H"""
+    <.link navigate={~p"/raffles/#{@raffle}"}>
     <div class="card">
       <img src={@raffle.image_path} />
       <h2><%= @raffle.prize %></h2>
@@ -42,6 +43,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
         <.badge status={@raffle.status} />
       </div>
     </div>
+    </.link>
     """
   end
 end
