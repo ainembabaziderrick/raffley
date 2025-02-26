@@ -1,45 +1,31 @@
 defmodule Raffley.Raffles do
   alias Raffley.Raffles.Raffle
+  alias Raffley.Repo
+  import Ecto.Query
   def list_raffles do
-    [
-      %Raffle{
-        id: 1,
-        prize: "Autographed Jersey",
-        ticket_price: 2,
-        status: :open,
-        image_path: "/images/jersey.jpg",
-        description: "Step up, sports fans!"
-      },
-      %Raffle{
-        id: 2,
-        prize: "Coffee With A Yeti",
-        ticket_price: 3,
-        status: :upcoming,
-        image_path: "/images/yeti-coffee.jpg",
-        description: "A super-chill coffee date."
-      },
-      %Raffle{
-        id: 3,
-        prize: "Vintage Comic Book",
-        ticket_price: 1,
-        status: :closed,
-        image_path: "/images/comic-book.jpg",
-        description: "A rare collectible!"
-      }
-    ]
+    Repo.all(Raffle)
   end
 
-  def get_raffle(id) when is_integer(id) do
-    Enum.find(list_raffles(), fn r -> r.id == id end)
+  def filter_raffles do
+    Raffle |>
+    where(status: :closed) |>
+    where([r], ilike(r.prize, "%gourmet%")) |>
+    order_by(:prize) |>
+    Repo.all()
   end
 
-  def get_raffle(id) when is_binary(id) do
-    id |> String.to_integer() |> get_raffle()
+  def get_raffle!(id) do
+    Repo.get!(Raffle, id)
   end
+
 
   def featured_raffles(raffle) do
-      list_raffles()
-      |>List.delete(raffle)
+      Raffle |>
+      where(status: :open) |>
+      where([r], r.id != ^raffle.id) |>
+      order_by(desc: :ticket_price) |>
+      limit(3) |>
+      Repo.all()
   end
 
 end

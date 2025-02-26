@@ -8,8 +8,8 @@ defmodule RaffleyWeb.RaffleLive.Show do
     {:ok, socket}
   end
 
-  def handle_params(%{"id" => id}, uri, socket) do
-    raffle = Raffles.get_raffle(id)
+  def handle_params(%{"id" => id}, _uri, socket) do
+    raffle = Raffles.get_raffle!(id)
 
     socket =
       socket
