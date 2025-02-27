@@ -5,7 +5,10 @@ defmodule RaffleyWeb.RaffleLive.Index do
   import RaffleyWeb.CustomComponents
 
   def mount(_params, _session, socket) do
-    socket = stream(socket, :raffles, Raffles.filter_raffles())
+    socket =
+      socket |>
+      stream(:raffles, Raffles.list_raffles()) |>
+      assign(:form, to_form%{})
     IO.inspect(socket.assigns.streams.raffles, label: "MOUNT")
     socket =
       attach_hook(socket, :log_stream, :after_render, fn
@@ -29,10 +32,32 @@ defmodule RaffleyWeb.RaffleLive.Index do
           Any guesses?
         </:details>
       </.banner>
+      <.filter_form form={@form}/>
+
       <div class="raffles" id = "raffles" phx-update="stream">
         <.raffle_card :for={{dom_id,raffle} <- @streams.raffles} raffle={raffle} id = {dom_id} />
       </div>
     </div>
+    """
+  end
+
+  def filter_form(assigns) do
+    ~H"""
+    <.form for={@form}>
+        <.input field={@form[:q]} placeholder="Search..." autocomplete = "off"/>
+        <.input
+        field = {@form[:status]}
+        type = "select"
+        options = {[:upcoming, :open, :closed]}
+        prompt = "Status"
+        />
+        <.input
+        field = {@form[:sort_by]}
+        type = "select"
+        options = {[:prize, :ticket_price]}
+        prompt = "Sort By"
+        />
+      </.form>
     """
   end
 
