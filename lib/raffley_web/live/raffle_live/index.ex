@@ -14,15 +14,6 @@ defmodule RaffleyWeb.RaffleLive.Index do
       |> stream(:raffles, Raffles.filter_raffles(params), reset: true)
       |> assign(:form, to_form(params))
 
-    IO.inspect(socket.assigns.streams.raffles, label: "MOUNT")
-
-    socket =
-      attach_hook(socket, :log_stream, :after_render, fn
-        socket ->
-          IO.inspect(socket.assigns.streams.raffles, label: "AFTER RENDER")
-          socket
-      end)
-
     {:noreply, socket}
   end
 
@@ -67,7 +58,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
         ]}
         prompt="Sort By"
       />
-      <.link navigate={~p"/raffles"}>
+      <.link patch={~p"/raffles"}>
         Reset
       </.link>
     </.form>
@@ -100,7 +91,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
       |> Map.take(~w(q status sort_by))
       |> Map.reject(fn {_, v} -> v == "" end)
 
-    socket = push_navigate(socket, to: ~p"/raffles?#{params}")
+    socket = push_patch(socket, to: ~p"/raffles?#{params}")
 
     {:noreply, socket}
   end
