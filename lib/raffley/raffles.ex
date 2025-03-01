@@ -2,30 +2,57 @@ defmodule Raffley.Raffles do
   alias Raffley.Raffles.Raffle
   alias Raffley.Repo
   import Ecto.Query
+
   def list_raffles do
     Repo.all(Raffle)
   end
 
   def filter_raffles(filter) do
-    Raffle |>
-    where(status: ^filter["status"]) |>
-    where([r], ilike(r.prize, ^"%#{filter["q"]}%")) |>
-    order_by(:prize) |>
-    Repo.all()
+    Raffle
+    |> with_status(filter["status"])
+    |> search_by(filter["q"])
+    |> sort(filter["sort_by"])
+    |> Repo.all()
+  end
+
+  defp with_status(query, status) when status in ~W(upcoming open closed) do
+    where(query, status: ^status)
+  end
+
+  defp with_status(query, _), do: query
+
+  defp search_by(query, _), do: query
+
+  defp search_by(query, q) do
+    where(query, [r], ilike(r.prize, ^"%#{q}%"))
+  end
+
+  defp sort(query, "prize") do
+    order_by(query, :prize)
+  end
+
+  defp sort(query, "ticket_price_desc") do
+    order_by(query, desc: :ticket_price)
+  end
+
+  defp sort(query, "ticket_price_asc") do
+    order_by(query, asc: :ticket_price)
+  end
+
+  defp sort(query, _) do
+    order_by(query, :id)
   end
 
   def get_raffle!(id) do
     Repo.get!(Raffle, id)
   end
 
-
   def featured_raffles(raffle) do
-      Raffle |>
-      where(status: :open) |>
-      where([r], r.id != ^raffle.id) |>
-      order_by(desc: :ticket_price) |>
-      limit(3) |>
-      Repo.all()
+    Raffle
+    |> where(status: :open)
+    |> where([r], r.id != ^raffle.id)
+    |> order_by(desc: :ticket_price)
+    |> limit(3)
+    |> Repo.all()
   end
-
 end

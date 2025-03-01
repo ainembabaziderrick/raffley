@@ -46,7 +46,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
   def filter_form(assigns) do
     ~H"""
     <.form for={@form} id="filter-form" phx-submit="filter" phx-change="filter">
-      <.input field={@form[:q]} placeholder="Search..." autocomplete="off" />
+      <.input field={@form[:q]} placeholder="Search..." autocomplete="off" phx-debounce="1000" />
       <.input
         field={@form[:status]}
         type="select"
@@ -56,7 +56,11 @@ defmodule RaffleyWeb.RaffleLive.Index do
       <.input
         field={@form[:sort_by]}
         type="select"
-        options={[:prize, :ticket_price]}
+        options={[
+          Prize: "prize",
+          "Price: High to low": "ticket_price_desc",
+          "Price: Low to high": "ticket_price_asc"
+        ]}
         prompt="Sort By"
       />
     </.form>
@@ -85,9 +89,10 @@ defmodule RaffleyWeb.RaffleLive.Index do
 
   def handle_event("filter", params, socket) do
     socket =
-      socket |>
-      assign(:form, to_form(params)) |>
-      stream(:raffles, Raffles.filter_raffles(params), reset: true)
+      socket
+      |> assign(:form, to_form(params))
+      |> stream(:raffles, Raffles.filter_raffles(params), reset: true)
+
     {:noreply, socket}
   end
 end
