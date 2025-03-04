@@ -23,5 +23,11 @@ defmodule Raffley.Admin do
     Repo.get!(Raffle, id)
   end
 
+  def update_raffle(%Raffle{} = raffle, attrs) do
+    raffle
+    |> Raffle.changeset(attrs)
+    |> Repo.update()
+  end
+
 
 end
