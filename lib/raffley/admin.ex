@@ -29,5 +29,9 @@ defmodule Raffley.Admin do
     |> Repo.update()
   end
 
+  def delete_raffle(%Raffle{} = raffle) do
+    Repo.delete(raffle)
+  end
+
 
 end
