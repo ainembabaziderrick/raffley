@@ -15,5 +15,9 @@ defmodule Raffley.Admin do
     |> Repo.insert()
   end
 
+  def change_raffle(%Raffle{} = raffle, attrs \\ %{}) do
+      Raffle.changeset(raffle, attrs)
+  end
+
 
 end
