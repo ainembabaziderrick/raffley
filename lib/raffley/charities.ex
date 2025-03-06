@@ -43,6 +43,10 @@ defmodule Raffley.Charities do
     Repo.all(from c in Charity, order_by: c.name, select: {c.name, c.id})
   end
 
+  def charity_names_and_slugs do
+    Repo.all(from c in Charity, order_by: c.name, select: {c.name, c.slung})
+  end
+
   @doc """
   Creates a charity.
 
