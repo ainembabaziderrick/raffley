@@ -12,7 +12,9 @@ defmodule Raffley.Raffles do
     |> with_status(filter["status"])
     |> search_by(filter["q"])
     |> sort(filter["sort_by"])
+    |> preload(:charity)
     |> Repo.all()
+
   end
 
   defp with_status(query, status) when status in ~W(upcoming open closed) do
@@ -45,6 +47,7 @@ defmodule Raffley.Raffles do
 
   def get_raffle!(id) do
     Repo.get!(Raffle, id)
+    |> Repo.preload(:charity)
   end
 
   def featured_raffles(raffle) do
