@@ -37,11 +37,13 @@ defmodule Raffley.Raffles do
 
   defp with_status(query, _), do: query
 
-  defp search_by(query, _), do: query
-
   defp search_by(query, q) do
     where(query, [r], ilike(r.prize, ^"%#{q}%"))
   end
+
+  defp search_by(query, _), do: query
+
+
 
   defp sort(query, "prize") do
     order_by(query, :prize)
@@ -54,7 +56,7 @@ defmodule Raffley.Raffles do
   defp sort(query, "ticket_price_asc") do
     order_by(query, asc: :ticket_price)
   end
-  
+
   defp sort(query, "charity") do
     from r in query,
       join: c in assoc(r, :charity),
